@@ -36,8 +36,22 @@ class LoginScreen extends Component {
           firebase
             .auth()
             .signInAndRetrieveDataWithCredential(credential)
-            .then(function() {
+            .then(function(result) {
               console.log("User signed in");
+              firebase
+                .database()
+                // reference unique id
+                .ref(`/users/` + result.user.uid)
+                .set({
+                  gmail: result.user.email,
+                  profile_picture: result.additionalUserInfo.profile.picture,
+                  locale: result.additionalUserInfo.profile.locale,
+                  first_name: result.additionalUserInfo.profile.given_name,
+                  last_name: result.additionalUserInfo.profile.family_name
+                })
+                .then(function(snapshot) {
+                  console.log("snapshot", snapshot);
+                });
             })
             .catch(function(error) {
               // Handle Errors here.
